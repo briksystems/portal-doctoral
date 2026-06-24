@@ -1092,31 +1092,73 @@
 
 <script>
 // ═══════════════════════════════════════
-// DATA STORE
+// SUPABASE CONFIG
 // ═══════════════════════════════════════
-let store = {
-  subjects: [
-    {
-      id: 1,
-      name: "Coloquio de Estudios Doctorales",
-      code: "DR30020",
-      credits: "4 horas",
-      prof: "Dr. Achucarro · Dr. Varela",
-      start: "24 ago 2026",
-      end: "27 ago 2026",
-      desc: "Introducción a las disciplinas académicas, profesionales, investigativas y personales necesarias para completar exitosamente los estudios doctorales.",
-      color: "#1a2744",
-      icon: "📖"
+const SUPABASE_URL = 'https://yazovauswncapzjedqqm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_KWyjT9bQ7DC5egyGFisbrA_-jhmecKl';
+
+async function sbGet(table, params = '') {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json'
     }
-  ],
-  files: [
-    { id: 1, subjectId: 1, folder: "libros", name: "Cómo leer un libro — Van Doren", url: "https://etnicografica.files.wordpress.com/2016/08/comoleerunlibro.pdf", type: "pdf" },
-    { id: 2, subjectId: 1, folder: "libros", name: "Deep Work (Céntrate) — Cal Newport", url: "#", type: "pdf" },
-    { id: 3, subjectId: 1, folder: "instrucciones", name: "Sílabo del curso DR30020", url: "DR30020-F26H3_Doctoral_Studies_Colloquium.pdf", type: "pdf" },
-    { id: 4, subjectId: 1, folder: "trabajos", name: "Plan de acción — Requisitos programáticos", url: "#", type: "doc" },
-    { id: 5, subjectId: 1, folder: "recursos", name: "Guía de pensamiento crítico", url: "http://www.criticalthinking.org", type: "link" },
-  ]
-};
+  });
+  return res.json();
+}
+
+async function sbPost(table, body) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+async function sbPatch(table, id, body) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method: 'PATCH',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+async function sbDelete(table, id) {
+  await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method: 'DELETE',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`
+    }
+  });
+}
+
+// ═══════════════════════════════════════
+// DATA STORE (cache local)
+// ═══════════════════════════════════════
+let store = { subjects: [], files: [] };
+
+async function loadData() {
+  showToast('Cargando...');
+  store.subjects = await sbGet('subjects', 'order=id.asc');
+  store.files = await sbGet('files', 'order=id.asc');
+  // normalize field names from DB
+  store.subjects = store.subjects.map(s => ({...s, start: s.start_date, end: s.end_date, desc: s.description}));
+  store.files = store.files.map(f => ({...f, subjectId: f.subject_id}));
+}
 
 let currentSubjectId = null;
 let currentFolder = null;
@@ -1128,11 +1170,11 @@ let activeTab = "info";
 // ═══════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════
-function goTo(screen) {
+async function goTo(screen) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + screen).classList.add('active');
-  if (screen === 'student') renderSubjects();
-  if (screen === 'admin') { renderAdminSubjects(); renderAdminFiles(); populateSubjectSelects(); }
+  if (screen === 'student') { await loadData(); renderSubjects(); }
+  if (screen === 'admin') { await loadData(); renderAdminSubjects(); renderAdminFiles(); populateSubjectSelects(); }
 }
 
 function goBack() {
@@ -1374,32 +1416,31 @@ function selectColor(el) {
   selectedColor = el.dataset.color;
 }
 
-function saveSubject() {
+async function saveSubject() {
   const name = document.getElementById('s-name').value.trim();
   if (!name) { showToast('Escribe el nombre de la materia'); return; }
   const obj = {
-    id: editingSubjectId || Date.now(),
     name,
     code: document.getElementById('s-code').value.trim() || 'SIN CÓDIGO',
     credits: document.getElementById('s-credits').value.trim() || '—',
     prof: document.getElementById('s-prof').value.trim() || '—',
-    start: document.getElementById('s-start').value.trim() || '—',
-    end: document.getElementById('s-end').value.trim() || '—',
-    desc: document.getElementById('s-desc').value.trim() || '',
+    start_date: document.getElementById('s-start').value.trim() || '—',
+    end_date: document.getElementById('s-end').value.trim() || '—',
+    description: document.getElementById('s-desc').value.trim() || '',
     color: selectedColor,
     icon: document.getElementById('s-icon').value,
   };
   if (editingSubjectId) {
-    const idx = store.subjects.findIndex(s => s.id === editingSubjectId);
-    store.subjects[idx] = obj;
+    await sbPatch('subjects', editingSubjectId, obj);
   } else {
-    store.subjects.push(obj);
+    await sbPost('subjects', obj);
   }
   closeModal('subject');
   clearSubjectForm();
+  await loadData();
   renderAdminSubjects();
   populateSubjectSelects();
-  showToast(editingSubjectId ? 'Materia actualizada' : 'Materia creada ✓');
+  showToast(editingSubjectId ? 'Materia actualizada ✓' : 'Materia creada ✓');
   editingSubjectId = null;
 }
 
@@ -1422,10 +1463,12 @@ function editSubject(id) {
   openModal('subject');
 }
 
-function deleteSubject(id) {
+async function deleteSubject(id) {
   if (!confirm('¿Eliminar esta materia y todos sus archivos?')) return;
-  store.subjects = store.subjects.filter(s => s.id !== id);
-  store.files = store.files.filter(f => f.subjectId !== id);
+  const filesToDelete = store.files.filter(f => f.subjectId === id);
+  for (const f of filesToDelete) await sbDelete('files', f.id);
+  await sbDelete('subjects', id);
+  await loadData();
   renderAdminSubjects();
   renderAdminFiles();
   populateSubjectSelects();
@@ -1440,14 +1483,13 @@ function clearSubjectForm() {
 // ═══════════════════════════════════════
 // MODAL: FILE
 // ═══════════════════════════════════════
-function saveFile() {
+async function saveFile() {
   const name = document.getElementById('f-name').value.trim();
   const url = document.getElementById('f-url').value.trim();
-  const subjectId = parseInt(document.getElementById('f-subject').value);
-  if (!name || !url || !subjectId) { showToast('Completa todos los campos'); return; }
-  store.files.push({
-    id: Date.now(),
-    subjectId,
+  const subject_id = parseInt(document.getElementById('f-subject').value);
+  if (!name || !url || !subject_id) { showToast('Completa todos los campos'); return; }
+  await sbPost('files', {
+    subject_id,
     folder: document.getElementById('f-folder').value,
     name,
     url,
@@ -1456,12 +1498,14 @@ function saveFile() {
   closeModal('file');
   document.getElementById('f-name').value = '';
   document.getElementById('f-url').value = '';
+  await loadData();
   renderAdminFiles();
   showToast('Archivo agregado ✓');
 }
 
-function deleteFile(id) {
-  store.files = store.files.filter(f => f.id !== id);
+async function deleteFile(id) {
+  await sbDelete('files', id);
+  await loadData();
   renderAdminFiles();
   showToast('Archivo eliminado');
 }
@@ -1487,7 +1531,7 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
 });
 
 // Init
-renderSubjects();
+loadData().then(() => renderSubjects());
 </script>
 </body>
 </html>
