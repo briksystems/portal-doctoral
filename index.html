@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Portal Doctoral · Pastor Ricardo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --navy: #1a2744;
+    --navy-light: #243258;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #f8f6f1;
+    --white: #ffffff;
+    --gray-100: #f1f0ec;
+    --gray-300: #d4d0c8;
+    --gray-500: #8a8578;
+    --gray-700: #4a4740;
+    --text: #1e1c18;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 4px 24px rgba(26,39,68,0.10);
+    --shadow-lg: 0 8px 40px rgba(26,39,68,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ── LOGIN SCREEN ── */
+  #screen-login {
+    background: var(--navy);
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #screen-login::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,168,76,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  #screen-login::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,168,76,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .login-monogram {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 32px;
+    position: relative;
+  }
+
+  .login-monogram-ring {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    border: 2px solid rgba(201,168,76,0.4);
+    position: absolute;
+    top: 0; left: 0;
+    animation: ringPulse 3s ease-in-out infinite;
+  }
+
+  @keyframes ringPulse {
+    0%, 100% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.08); opacity: 0.9; }
+  }
+
+  .login-monogram-inner {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--gold) 0%, #a87e2e 100%);
+    border-radius: 50%;
+    position: absolute;
+    top: 8px; left: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--navy);
+    font-weight: 700;
+    letter-spacing: -1px;
+  }
+
+  .login-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .login-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    color: var(--white);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+
+  .login-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--gold-light);
+    margin-bottom: 8px;
+    font-style: italic;
+  }
+
+  .login-divider {
+    width: 48px;
+    height: 1px;
+    background: rgba(201,168,76,0.4);
+    margin: 16px auto 20px;
+  }
+
+  .login-subtitle {
+    font-size: 13px;
+    color: var(--gray-300);
+    margin-bottom: 36px;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+
+  .login-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .btn-student {
+    background: linear-gradient(135deg, var(--gold) 0%, #a87e2e 100%);
+    color: var(--navy);
+    font-size: 16px;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.35);
+  }
+
+  .btn-student:hover {
+    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);
+    box-shadow: 0 6px 28px rgba(201,168,76,0.5);
+  }
+
+  .btn-admin {
+    background: transparent;
+    color: var(--gray-300);
+    border: 1.5px solid rgba(255,255,255,0.2);
+  }
+
+  .btn-admin:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ── STUDENT VIEW ── */
+  #screen-student {
+    background: var(--cream);
+  }
+
+  /* Header */
+  .student-header {
+    background: var(--navy);
+    padding: 52px 24px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .header-greeting {
+    font-size: 13px;
+    color: var(--gold);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--white);
+    margin-top: 2px;
+  }
+
+  .back-btn {
+    background: rgba(255,255,255,0.12);
+    border: none;
+    color: var(--white);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    display: none;
+  }
+
+  .back-btn.visible { display: block; }
+
+  .logout-btn {
+    background: none;
+    border: none;
+    color: var(--gray-300);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Content area */
+  .content {
+    flex: 1;
+    padding: 24px 20px;
+    overflow-y: auto;
+  }
+
+  /* Section label */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    margin-bottom: 14px;
+  }
+
+  /* Subject cards */
+  .subjects-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .subject-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all 0.22s;
+    border-left: 4px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .subject-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .subject-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.06;
+    transform: translate(20px, -20px);
+  }
+
+  .subject-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .subject-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .subject-info { flex: 1; }
+
+  .subject-code {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  .subject-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .subject-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--gray-100);
+  }
+
+  .subject-meta-item {
+    font-size: 12px;
+    color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .chevron {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-300);
+    font-size: 18px;
+  }
+
+  /* ── SUBJECT DETAIL ── */
+  .detail-tabs {
+    display: flex;
+    gap: 0;
+    background: var(--gray-100);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    margin-bottom: 20px;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--gray-500);
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .tab-btn.active {
+    background: var(--white);
+    color: var(--navy);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  /* Info panel */
+  .info-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+
+  .info-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: var(--navy);
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-100);
+    gap: 12px;
+  }
+
+  .info-row:last-child { border-bottom: none; }
+
+  .info-label {
+    font-size: 12px;
+    color: var(--gray-500);
+    font-weight: 500;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .info-value {
+    font-size: 14px;
+    color: var(--text);
+    text-align: right;
+    line-height: 1.4;
+  }
+
+  /* Folders */
+  .folder-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .folder-item {
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.2s;
+  }
+
+  .folder-item:hover { transform: translateX(4px); }
+
+  .folder-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .folder-info { flex: 1; }
+
+  .folder-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .folder-count {
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-top: 2px;
+  }
+
+  /* File list */
+  .file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .file-item {
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .file-item:hover { background: var(--gray-100); }
+
+  .file-icon {
+    width: 36px;
+    height: 36px;
+    background: #fff0f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .file-info { flex: 1; }
+
+  .file-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .file-meta {
+    font-size: 11px;
+    color: var(--gray-500);
+    margin-top: 2px;
+  }
+
+  /* ── ADMIN PANEL ── */
+  #screen-admin {
+    background: var(--cream);
+  }
+
+  .admin-header {
+    background: var(--navy-light);
+    padding: 52px 24px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .admin-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .admin-badge {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+
+  .admin-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--white);
+  }
+
+  .admin-nav {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .admin-nav-btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: var(--gray-300);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .admin-nav-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--navy);
+  }
+
+  /* Admin content */
+  .admin-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .admin-panel { display: none; }
+  .admin-panel.active { display: block; }
+
+  /* Add button */
+  .add-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .add-btn:hover { background: var(--navy-light); }
+
+  /* Admin list */
+  .admin-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .admin-item {
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .admin-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .admin-item-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .admin-item-sub {
+    font-size: 12px;
+    color: var(--gray-500);
+  }
+
+  .admin-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .action-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .btn-edit { background: var(--gray-100); color: var(--gray-700); }
+  .btn-delete { background: #fff0f0; color: #c0392b; }
+  .btn-view { background: #f0f4ff; color: var(--navy); }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--white);
+    border-radius: 20px 20px 0 0;
+    padding: 28px 24px 40px;
+    width: 100%;
+    max-width: 600px;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .modal-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--gray-300);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: var(--navy);
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+
+  .form-input, .form-textarea, .form-select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input:focus, .form-textarea:focus, .form-select:focus {
+    border-color: var(--navy);
+  }
+
+  .form-textarea { min-height: 80px; resize: vertical; }
+
+  .form-row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .form-row .form-group { flex: 1; }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .btn-cancel {
+    flex: 1;
+    padding: 14px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    color: var(--gray-700);
+  }
+
+  .btn-save {
+    flex: 2;
+    padding: 14px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Colors palette for subjects */
+  .color-picker {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .color-opt {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .color-opt.selected { border-color: var(--navy); transform: scale(1.15); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--navy);
+    color: var(--white);
+    padding: 12px 22px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 200;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Responsive */
+  @media (min-width: 600px) {
+    .subjects-grid { display: grid; grid-template-columns: 1fr 1fr; }
+    .student-header { padding-top: 28px; }
+    .admin-header { padding-top: 28px; }
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--gray-500);
+  }
+
+  .empty-state-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state-text { font-size: 15px; }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--gray-300);
+    margin-top: 4px;
+  }
+
+  .breadcrumb span { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     SCREEN: LOGIN
+═══════════════════════════════════════ -->
+<div id="screen-login" class="screen active">
+  <div class="login-box">
+    <div class="login-monogram">
+      <div class="login-monogram-ring"></div>
+      <div class="login-monogram-inner">RR</div>
+    </div>
+    <div class="login-eyebrow">Portal Doctoral</div>
+    <h1 class="login-title">Pastor Ricardo<br>Rodríguez Bermúdez</h1>
+    <div class="login-divider"></div>
+    <p class="login-subtitle">Midwestern Baptist Theological Seminary<br>Programa de Doctorado · Otoño 2026</p>
+    <button class="login-btn btn-student" onclick="goTo('student')">
+      Acceder a mis materias
+    </button>
+    <button class="login-btn btn-admin" onclick="goTo('admin')">
+      ⚙️ &nbsp;Administrador
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN: STUDENT
+═══════════════════════════════════════ -->
+<div id="screen-student" class="screen">
+
+  <div class="student-header">
+    <div class="header-row">
+      <div>
+        <div id="header-eyebrow" class="header-greeting">Mis materias</div>
+        <div id="header-title" class="header-title">Pastor Ricardo</div>
+        <div id="header-breadcrumb" class="breadcrumb"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="back-btn" class="back-btn" onclick="goBack()">← Atrás</button>
+        <button class="logout-btn" onclick="goTo('login')">Salir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subjects list -->
+  <div id="view-subjects" class="content">
+    <div class="section-label" style="margin-bottom:14px">Semestre Otoño 2026</div>
+    <div class="subjects-grid" id="subjects-grid"></div>
+  </div>
+
+  <!-- Subject detail -->
+  <div id="view-subject-detail" class="content" style="display:none">
+    <div class="detail-tabs">
+      <button class="tab-btn active" onclick="switchTab('info')">Información</button>
+      <button class="tab-btn" onclick="switchTab('folders')">Carpetas</button>
+    </div>
+    <div id="tab-info"></div>
+    <div id="tab-folders" style="display:none"></div>
+  </div>
+
+  <!-- Folder contents -->
+  <div id="view-folder" class="content" style="display:none">
+    <div class="file-list" id="file-list"></div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN: ADMIN
+═══════════════════════════════════════ -->
+<div id="screen-admin" class="screen">
+
+  <div class="admin-header">
+    <div class="admin-header-row">
+      <div>
+        <div class="admin-badge">⚙ Panel de administrador</div>
+        <div class="admin-title">Gestión del Portal</div>
+      </div>
+      <button class="logout-btn" style="color:var(--gray-300)" onclick="goTo('login')">Salir</button>
+    </div>
+    <div class="admin-nav">
+      <button class="admin-nav-btn active" onclick="switchAdminTab('materias')">Materias</button>
+      <button class="admin-nav-btn" onclick="switchAdminTab('archivos')">Archivos</button>
+      <button class="admin-nav-btn" onclick="switchAdminTab('vista')">Vista previa</button>
+    </div>
+  </div>
+
+  <div class="admin-content">
+
+    <!-- Panel: Materias -->
+    <div id="admin-materias" class="admin-panel active">
+      <button class="add-btn" onclick="openModal('subject')">＋ &nbsp;Nueva materia</button>
+      <div class="admin-list" id="admin-subjects-list"></div>
+    </div>
+
+    <!-- Panel: Archivos -->
+    <div id="admin-archivos" class="admin-panel">
+      <div class="form-group">
+        <label class="form-label">Materia</label>
+        <select class="form-select" id="admin-file-subject-filter" onchange="renderAdminFiles()">
+          <option value="">Todas las materias</option>
+        </select>
+      </div>
+      <button class="add-btn" onclick="openModal('file')">＋ &nbsp;Agregar archivo</button>
+      <div class="admin-list" id="admin-files-list"></div>
+    </div>
+
+    <!-- Panel: Vista previa -->
+    <div id="admin-vista" class="admin-panel">
+      <div class="info-card">
+        <h3>Vista del estudiante</h3>
+        <p style="font-size:14px;color:var(--gray-500);line-height:1.6">
+          Aquí puedes ver exactamente cómo ve tu abuelo la aplicación. Los cambios que hagas en el panel se reflejan aquí al instante.
+        </p>
+        <button class="add-btn" style="margin-top:16px;margin-bottom:0" onclick="goTo('student')">
+          👁 &nbsp;Ver como estudiante
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MODAL: Add/Edit Subject
+═══════════════════════════════════════ -->
+<div id="modal-subject" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-subject-title">Nueva materia</div>
+    <div class="form-group">
+      <label class="form-label">Nombre de la materia</label>
+      <input class="form-input" id="s-name" placeholder="Ej: Coloquio de Estudios Doctorales">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Código</label>
+        <input class="form-input" id="s-code" placeholder="DR30020">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Créditos</label>
+        <input class="form-input" id="s-credits" placeholder="4 horas" type="text">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Profesor(es)</label>
+      <input class="form-input" id="s-prof" placeholder="Dr. Achucarro · Dr. Varela">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Fecha inicio</label>
+        <input class="form-input" id="s-start" type="text" placeholder="24 ago 2026">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fecha fin</label>
+        <input class="form-input" id="s-end" type="text" placeholder="27 ago 2026">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descripción breve</label>
+      <textarea class="form-textarea" id="s-desc" placeholder="Descripción del curso..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Color e ícono</label>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div class="color-picker" id="color-picker">
+          <div class="color-opt selected" style="background:#1a2744" data-color="#1a2744" onclick="selectColor(this)"></div>
+          <div class="color-opt" style="background:#7b3f6e" data-color="#7b3f6e" onclick="selectColor(this)"></div>
+          <div class="color-opt" style="background:#2e6b4f" data-color="#2e6b4f" onclick="selectColor(this)"></div>
+          <div class="color-opt" style="background:#8b4513" data-color="#8b4513" onclick="selectColor(this)"></div>
+          <div class="color-opt" style="background:#2c5f8a" data-color="#2c5f8a" onclick="selectColor(this)"></div>
+          <div class="color-opt" style="background:#6b4226" data-color="#6b4226" onclick="selectColor(this)"></div>
+        </div>
+        <select class="form-select" id="s-icon" style="width:auto">
+          <option value="📖">📖 Libro</option>
+          <option value="✝">✝ Cruz</option>
+          <option value="🏛">🏛 Universidad</option>
+          <option value="📝">📝 Escritura</option>
+          <option value="🔍">🔍 Investigación</option>
+          <option value="📜">📜 Documento</option>
+          <option value="🎓">🎓 Graduación</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('subject')">Cancelar</button>
+      <button class="btn-save" onclick="saveSubject()">Guardar materia</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MODAL: Add File
+═══════════════════════════════════════ -->
+<div id="modal-file" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Agregar archivo</div>
+    <div class="form-group">
+      <label class="form-label">Materia</label>
+      <select class="form-select" id="f-subject"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Carpeta</label>
+      <select class="form-select" id="f-folder">
+        <option value="libros">📚 Libros</option>
+        <option value="trabajos">📝 Trabajos</option>
+        <option value="instrucciones">📋 Instrucciones</option>
+        <option value="recursos">🔗 Recursos</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nombre del archivo</label>
+      <input class="form-input" id="f-name" placeholder="Ej: Cómo leer un libro — Van Doren">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Enlace o URL del archivo</label>
+      <input class="form-input" id="f-url" placeholder="https://drive.google.com/... o enlace directo">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tipo</label>
+      <select class="form-select" id="f-type">
+        <option value="pdf">PDF</option>
+        <option value="link">Enlace web</option>
+        <option value="video">Video</option>
+        <option value="doc">Documento Word</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('file')">Cancelar</button>
+      <button class="btn-save" onclick="saveFile()">Guardar archivo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA STORE
+// ═══════════════════════════════════════
+let store = {
+  subjects: [
+    {
+      id: 1,
+      name: "Coloquio de Estudios Doctorales",
+      code: "DR30020",
+      credits: "4 horas",
+      prof: "Dr. Achucarro · Dr. Varela",
+      start: "24 ago 2026",
+      end: "27 ago 2026",
+      desc: "Introducción a las disciplinas académicas, profesionales, investigativas y personales necesarias para completar exitosamente los estudios doctorales.",
+      color: "#1a2744",
+      icon: "📖"
+    }
+  ],
+  files: [
+    { id: 1, subjectId: 1, folder: "libros", name: "Cómo leer un libro — Van Doren", url: "https://etnicografica.files.wordpress.com/2016/08/comoleerunlibro.pdf", type: "pdf" },
+    { id: 2, subjectId: 1, folder: "libros", name: "Deep Work (Céntrate) — Cal Newport", url: "#", type: "pdf" },
+    { id: 3, subjectId: 1, folder: "instrucciones", name: "Sílabo del curso DR30020", url: "DR30020-F26H3_Doctoral_Studies_Colloquium.pdf", type: "pdf" },
+    { id: 4, subjectId: 1, folder: "trabajos", name: "Plan de acción — Requisitos programáticos", url: "#", type: "doc" },
+    { id: 5, subjectId: 1, folder: "recursos", name: "Guía de pensamiento crítico", url: "http://www.criticalthinking.org", type: "link" },
+  ]
+};
+
+let currentSubjectId = null;
+let currentFolder = null;
+let editingSubjectId = null;
+let selectedColor = "#1a2744";
+let studentView = "subjects"; // subjects | detail | folder
+let activeTab = "info";
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function goTo(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+  if (screen === 'student') renderSubjects();
+  if (screen === 'admin') { renderAdminSubjects(); renderAdminFiles(); populateSubjectSelects(); }
+}
+
+function goBack() {
+  if (studentView === 'folder') {
+    showStudentView('detail');
+  } else if (studentView === 'detail') {
+    showStudentView('subjects');
+  }
+}
+
+function showStudentView(view) {
+  studentView = view;
+  document.getElementById('view-subjects').style.display = 'none';
+  document.getElementById('view-subject-detail').style.display = 'none';
+  document.getElementById('view-folder').style.display = 'none';
+  document.getElementById('back-btn').classList.remove('visible');
+
+  if (view === 'subjects') {
+    document.getElementById('view-subjects').style.display = 'block';
+    document.getElementById('header-eyebrow').textContent = 'Mis materias';
+    document.getElementById('header-title').textContent = 'Pastor Ricardo';
+    document.getElementById('header-breadcrumb').textContent = '';
+  } else if (view === 'detail') {
+    document.getElementById('view-subject-detail').style.display = 'block';
+    document.getElementById('back-btn').classList.add('visible');
+    const s = store.subjects.find(x => x.id === currentSubjectId);
+    document.getElementById('header-eyebrow').textContent = s.code;
+    document.getElementById('header-title').textContent = s.name.length > 30 ? s.name.substring(0,30)+'…' : s.name;
+    document.getElementById('header-breadcrumb').textContent = '';
+    renderSubjectDetail(s);
+    switchTab('info');
+  } else if (view === 'folder') {
+    document.getElementById('view-folder').style.display = 'block';
+    document.getElementById('back-btn').classList.add('visible');
+    const s = store.subjects.find(x => x.id === currentSubjectId);
+    const folderNames = { libros:'📚 Libros', trabajos:'📝 Trabajos', instrucciones:'📋 Instrucciones', recursos:'🔗 Recursos' };
+    document.getElementById('header-eyebrow').textContent = s.code;
+    document.getElementById('header-title').textContent = folderNames[currentFolder] || currentFolder;
+    document.getElementById('header-breadcrumb').innerHTML = '<span>' + (s.name.length > 25 ? s.name.substring(0,25)+'…' : s.name) + '</span>';
+    renderFolderFiles();
+  }
+}
+
+// ═══════════════════════════════════════
+// STUDENT: SUBJECTS
+// ═══════════════════════════════════════
+function renderSubjects() {
+  const grid = document.getElementById('subjects-grid');
+  if (store.subjects.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No hay materias aún</div></div>';
+    return;
+  }
+  grid.innerHTML = store.subjects.map(s => `
+    <div class="subject-card" onclick="openSubject(${s.id})" style="border-left-color:${s.color}">
+      <div class="subject-card-header">
+        <div class="subject-icon" style="background:${s.color}20">${s.icon}</div>
+        <div class="subject-info">
+          <div class="subject-code" style="color:${s.color}">${s.code}</div>
+          <div class="subject-name">${s.name}</div>
+        </div>
+      </div>
+      <div class="subject-meta">
+        <div class="subject-meta-item">🗓 ${s.start}</div>
+        <div class="subject-meta-item">👤 ${s.prof.split('·')[0].trim()}</div>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+  `).join('');
+}
+
+function openSubject(id) {
+  currentSubjectId = id;
+  showStudentView('detail');
+}
+
+// ═══════════════════════════════════════
+// STUDENT: SUBJECT DETAIL
+// ═══════════════════════════════════════
+function renderSubjectDetail(s) {
+  // Info tab
+  document.getElementById('tab-info').innerHTML = `
+    <div class="info-card">
+      <h3>Información del curso</h3>
+      <div class="info-row"><span class="info-label">Código</span><span class="info-value">${s.code}</span></div>
+      <div class="info-row"><span class="info-label">Créditos</span><span class="info-value">${s.credits}</span></div>
+      <div class="info-row"><span class="info-label">Profesor(es)</span><span class="info-value">${s.prof}</span></div>
+      <div class="info-row"><span class="info-label">Inicio</span><span class="info-value">${s.start}</span></div>
+      <div class="info-row"><span class="info-label">Finalización</span><span class="info-value">${s.end}</span></div>
+    </div>
+    <div class="info-card">
+      <h3>Descripción</h3>
+      <p style="font-size:14px;color:var(--gray-700);line-height:1.7">${s.desc}</p>
+    </div>
+  `;
+
+  // Folders tab
+  const folders = ['libros','trabajos','instrucciones','recursos'];
+  const folderMeta = {
+    libros:   { icon:'📚', label:'Libros', bg:'#f0f4ff' },
+    trabajos: { icon:'📝', label:'Trabajos', bg:'#f0fff4' },
+    instrucciones: { icon:'📋', label:'Instrucciones', bg:'#fff8f0' },
+    recursos: { icon:'🔗', label:'Recursos', bg:'#fdf0ff' },
+  };
+  document.getElementById('tab-folders').innerHTML = `
+    <div class="folder-list">
+      ${folders.map(f => {
+        const count = store.files.filter(x => x.subjectId === currentSubjectId && x.folder === f).length;
+        return `
+          <div class="folder-item" onclick="openFolder('${f}')">
+            <div class="folder-icon" style="background:${folderMeta[f].bg}">${folderMeta[f].icon}</div>
+            <div class="folder-info">
+              <div class="folder-name">${folderMeta[f].label}</div>
+              <div class="folder-count">${count} archivo${count !== 1 ? 's' : ''}</div>
+            </div>
+            <div style="color:var(--gray-300);font-size:18px">›</div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', (i === 0 && tab === 'info') || (i === 1 && tab === 'folders'));
+  });
+  document.getElementById('tab-info').style.display = tab === 'info' ? 'block' : 'none';
+  document.getElementById('tab-folders').style.display = tab === 'folders' ? 'block' : 'none';
+}
+
+function openFolder(folder) {
+  currentFolder = folder;
+  showStudentView('folder');
+}
+
+function renderFolderFiles() {
+  const files = store.files.filter(f => f.subjectId === currentSubjectId && f.folder === currentFolder);
+  const typeIcon = { pdf:'📄', link:'🌐', video:'🎥', doc:'📃' };
+  const list = document.getElementById('file-list');
+  if (files.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No hay archivos en esta carpeta aún</div></div>';
+    return;
+  }
+  list.innerHTML = files.map(f => `
+    <a class="file-item" href="${f.url}" target="_blank" rel="noopener">
+      <div class="file-icon">${typeIcon[f.type] || '📄'}</div>
+      <div class="file-info">
+        <div class="file-name">${f.name}</div>
+        <div class="file-meta">${f.type.toUpperCase()} · Toca para abrir</div>
+      </div>
+      <div style="color:var(--gray-300)">›</div>
+    </a>
+  `).join('');
+}
+
+// ═══════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════
+function switchAdminTab(tab) {
+  document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('admin-' + tab).classList.add('active');
+}
+
+function renderAdminSubjects() {
+  const list = document.getElementById('admin-subjects-list');
+  if (store.subjects.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">Sin materias. Agrega la primera.</div></div>';
+    return;
+  }
+  list.innerHTML = store.subjects.map(s => `
+    <div class="admin-item">
+      <div class="admin-item-header">
+        <div>
+          <div class="admin-item-title">${s.icon} ${s.name}</div>
+          <div class="admin-item-sub">${s.code} · ${s.credits}</div>
+        </div>
+        <div class="admin-actions">
+          <button class="action-btn btn-edit" onclick="editSubject(${s.id})">Editar</button>
+          <button class="action-btn btn-delete" onclick="deleteSubject(${s.id})">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAdminFiles() {
+  const filterId = parseInt(document.getElementById('admin-file-subject-filter').value) || null;
+  let files = filterId ? store.files.filter(f => f.subjectId === filterId) : store.files;
+  const list = document.getElementById('admin-files-list');
+  const typeIcon = { pdf:'📄', link:'🌐', video:'🎥', doc:'📃' };
+  if (files.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No hay archivos.</div></div>';
+    return;
+  }
+  list.innerHTML = files.map(f => {
+    const s = store.subjects.find(x => x.id === f.subjectId);
+    return `
+      <div class="admin-item">
+        <div class="admin-item-header">
+          <div>
+            <div class="admin-item-title">${typeIcon[f.type]} ${f.name}</div>
+            <div class="admin-item-sub">${s ? s.code : '—'} · ${f.folder} · ${f.type.toUpperCase()}</div>
+          </div>
+          <div class="admin-actions">
+            <button class="action-btn btn-delete" onclick="deleteFile(${f.id})">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function populateSubjectSelects() {
+  const opts = store.subjects.map(s => `<option value="${s.id}">${s.code} · ${s.name}</option>`).join('');
+  const filter = document.getElementById('admin-file-subject-filter');
+  const fSubject = document.getElementById('f-subject');
+  filter.innerHTML = '<option value="">Todas</option>' + opts;
+  fSubject.innerHTML = opts || '<option value="">Sin materias</option>';
+}
+
+// ═══════════════════════════════════════
+// MODAL: SUBJECT
+// ═══════════════════════════════════════
+function openModal(type, id) {
+  document.getElementById('modal-' + type).classList.add('open');
+}
+
+function closeModal(type) {
+  document.getElementById('modal-' + type).classList.remove('open');
+  if (type === 'subject') editingSubjectId = null;
+}
+
+function selectColor(el) {
+  document.querySelectorAll('.color-opt').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedColor = el.dataset.color;
+}
+
+function saveSubject() {
+  const name = document.getElementById('s-name').value.trim();
+  if (!name) { showToast('Escribe el nombre de la materia'); return; }
+  const obj = {
+    id: editingSubjectId || Date.now(),
+    name,
+    code: document.getElementById('s-code').value.trim() || 'SIN CÓDIGO',
+    credits: document.getElementById('s-credits').value.trim() || '—',
+    prof: document.getElementById('s-prof').value.trim() || '—',
+    start: document.getElementById('s-start').value.trim() || '—',
+    end: document.getElementById('s-end').value.trim() || '—',
+    desc: document.getElementById('s-desc').value.trim() || '',
+    color: selectedColor,
+    icon: document.getElementById('s-icon').value,
+  };
+  if (editingSubjectId) {
+    const idx = store.subjects.findIndex(s => s.id === editingSubjectId);
+    store.subjects[idx] = obj;
+  } else {
+    store.subjects.push(obj);
+  }
+  closeModal('subject');
+  clearSubjectForm();
+  renderAdminSubjects();
+  populateSubjectSelects();
+  showToast(editingSubjectId ? 'Materia actualizada' : 'Materia creada ✓');
+  editingSubjectId = null;
+}
+
+function editSubject(id) {
+  const s = store.subjects.find(x => x.id === id);
+  editingSubjectId = id;
+  document.getElementById('s-name').value = s.name;
+  document.getElementById('s-code').value = s.code;
+  document.getElementById('s-credits').value = s.credits;
+  document.getElementById('s-prof').value = s.prof;
+  document.getElementById('s-start').value = s.start;
+  document.getElementById('s-end').value = s.end;
+  document.getElementById('s-desc').value = s.desc;
+  document.getElementById('s-icon').value = s.icon;
+  selectedColor = s.color;
+  document.querySelectorAll('.color-opt').forEach(c => {
+    c.classList.toggle('selected', c.dataset.color === s.color);
+  });
+  document.getElementById('modal-subject-title').textContent = 'Editar materia';
+  openModal('subject');
+}
+
+function deleteSubject(id) {
+  if (!confirm('¿Eliminar esta materia y todos sus archivos?')) return;
+  store.subjects = store.subjects.filter(s => s.id !== id);
+  store.files = store.files.filter(f => f.subjectId !== id);
+  renderAdminSubjects();
+  renderAdminFiles();
+  populateSubjectSelects();
+  showToast('Materia eliminada');
+}
+
+function clearSubjectForm() {
+  ['s-name','s-code','s-credits','s-prof','s-start','s-end','s-desc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('modal-subject-title').textContent = 'Nueva materia';
+}
+
+// ═══════════════════════════════════════
+// MODAL: FILE
+// ═══════════════════════════════════════
+function saveFile() {
+  const name = document.getElementById('f-name').value.trim();
+  const url = document.getElementById('f-url').value.trim();
+  const subjectId = parseInt(document.getElementById('f-subject').value);
+  if (!name || !url || !subjectId) { showToast('Completa todos los campos'); return; }
+  store.files.push({
+    id: Date.now(),
+    subjectId,
+    folder: document.getElementById('f-folder').value,
+    name,
+    url,
+    type: document.getElementById('f-type').value,
+  });
+  closeModal('file');
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-url').value = '';
+  renderAdminFiles();
+  showToast('Archivo agregado ✓');
+}
+
+function deleteFile(id) {
+  store.files = store.files.filter(f => f.id !== id);
+  renderAdminFiles();
+  showToast('Archivo eliminado');
+}
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) {
+      overlay.classList.remove('open');
+      editingSubjectId = null;
+    }
+  });
+});
+
+// Init
+renderSubjects();
+</script>
+</body>
+</html>
