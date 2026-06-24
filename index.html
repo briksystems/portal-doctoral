@@ -1900,10 +1900,10 @@ async function sendChat() {
         'Content-Type': 'application/json',
         'x-api-key': ANTHROPIC_KEY,
         'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-client-side-keys-allowed': 'true'
+        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
         system: `Eres el asistente académico personal del Pastor Ricardo Rodríguez Bermúdez, estudiante de doctorado en Midwestern Baptist Theological Seminary. 
 Responde siempre en español, de forma clara, respetuosa y concisa.
@@ -1914,7 +1914,7 @@ Tienes acceso a la siguiente información de sus cursos:\n\n${context}`,
     });
 
     const data = await res.json();
-    const reply = data.content?.[0]?.text || 'Lo siento, no pude procesar su pregunta.';
+    const reply = (data.content || []).map(b => b.text || '').join('') || 'Lo siento, no pude procesar su pregunta.';
     typing.remove();
     appendChatBubble('assistant', reply);
     chatHistory.push({ role: 'assistant', content: reply });
@@ -1969,10 +1969,10 @@ async function generateSubjectWithAI() {
         'Content-Type': 'application/json',
         'x-api-key': ANTHROPIC_KEY,
         'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-client-side-keys-allowed': 'true'
+        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
         system: `Extrae información de un sílabo académico y devuelve SOLO un objeto JSON válido con estos campos exactos:
 {
