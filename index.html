@@ -843,14 +843,207 @@
   .empty-state-icon { font-size: 40px; margin-bottom: 12px; }
   .empty-state-text { font-size: 15px; }
 
-  /* Breadcrumb */
-  .breadcrumb {
-    font-size: 12px;
-    color: var(--gray-300);
-    margin-top: 4px;
+  /* ── CHAT ── */
+  .chat-fab {
+    position: fixed;
+    bottom: 28px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold) 0%, #a87e2e 100%);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.5);
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    transition: all 0.2s;
   }
 
-  .breadcrumb span { color: var(--gold); }
+  .chat-fab:hover { transform: scale(1.08); }
+
+  .chat-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .chat-modal.open { display: flex; }
+
+  .chat-box {
+    background: var(--white);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 600px;
+    height: 75vh;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease;
+  }
+
+  .chat-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .chat-header-info { display: flex; align-items: center; gap: 10px; }
+
+  .chat-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), #a87e2e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--navy);
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .chat-header-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .chat-header-sub {
+    font-size: 11px;
+    color: var(--gray-500);
+  }
+
+  .chat-close {
+    background: var(--gray-100);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .chat-bubble {
+    max-width: 82%;
+    padding: 12px 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .chat-bubble.assistant {
+    background: var(--gray-100);
+    color: var(--text);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+
+  .chat-bubble.user {
+    background: var(--navy);
+    color: var(--white);
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+
+  .chat-bubble.typing {
+    background: var(--gray-100);
+    align-self: flex-start;
+    color: var(--gray-500);
+    font-style: italic;
+  }
+
+  .chat-input-row {
+    padding: 12px 16px;
+    border-top: 1px solid var(--gray-100);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .chat-input {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 24px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .chat-input:focus { border-color: var(--navy); }
+
+  .chat-send {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--navy);
+    border: none;
+    color: var(--white);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .chat-send:hover { background: var(--navy-light); }
+
+  .chat-suggestion {
+    background: var(--white);
+    border: 1.5px solid var(--gray-300);
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: var(--navy);
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .chat-suggestion:hover { border-color: var(--gold); color: var(--gold); }
+
+  .suggestions-row {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+    overflow-x: auto;
+    border-top: 1px solid var(--gray-100);
+  }
+
+  /* AI button in admin */
+  .ai-btn {
+    background: linear-gradient(135deg, var(--gold) 0%, #a87e2e 100%);
+    color: var(--navy);
+    font-weight: 700;
+  }
+
+  .ai-btn:hover { opacity: 0.9; }
 </style>
 </head>
 <body>
@@ -917,6 +1110,43 @@
     <div class="file-list" id="file-list"></div>
   </div>
 
+  <!-- Chat FAB -->
+  <button class="chat-fab" onclick="openChat()">🤖</button>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     CHAT MODAL
+═══════════════════════════════════════ -->
+<div id="chat-modal" class="chat-modal">
+  <div class="chat-box">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar">AI</div>
+        <div>
+          <div class="chat-header-name">Asistente del curso</div>
+          <div class="chat-header-sub">Pregúntame sobre tus materias</div>
+        </div>
+      </div>
+      <button class="chat-close" onclick="closeChat()">✕</button>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-bubble assistant">
+        ¡Hola Pastor Ricardo! Soy su asistente. Puedo ayudarle con información sobre sus materias, fechas, libros, trabajos y más. ¿En qué le puedo ayudar?
+      </div>
+    </div>
+    <div class="suggestions-row" id="suggestions-row">
+      <button class="chat-suggestion" onclick="sendSuggestion('¿Cuándo es la semana presencial?')">📅 Fechas</button>
+      <button class="chat-suggestion" onclick="sendSuggestion('¿Qué libros tengo que leer?')">📚 Libros</button>
+      <button class="chat-suggestion" onclick="sendSuggestion('¿Cuáles son los trabajos que debo entregar?')">📝 Trabajos</button>
+      <button class="chat-suggestion" onclick="sendSuggestion('¿Dónde está el sílabo?')">📋 Sílabo</button>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chat-input" placeholder="Escribe su pregunta..." 
+        onkeydown="if(event.key==='Enter') sendChat()">
+      <button class="chat-send" onclick="sendChat()">➤</button>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════════
@@ -943,7 +1173,8 @@
 
     <!-- Panel: Materias -->
     <div id="admin-materias" class="admin-panel active">
-      <button class="add-btn" onclick="openModal('subject')">＋ &nbsp;Nueva materia</button>
+      <button class="add-btn ai-btn" onclick="openModal('ai-subject')">✨ &nbsp;Crear materia con IA</button>
+      <button class="add-btn" onclick="openModal('subject')">＋ &nbsp;Nueva materia manual</button>
       <div class="admin-list" id="admin-subjects-list"></div>
     </div>
 
@@ -1116,6 +1347,28 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════
+     MODAL: AI Subject
+═══════════════════════════════════════ -->
+<div id="modal-ai-subject" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✨ Crear materia con IA</div>
+    <div class="form-group">
+      <label class="form-label">Pega el sílabo o describe la materia</label>
+      <textarea class="form-textarea" id="ai-syllabus" style="min-height:140px" 
+        placeholder="Pega aquí el texto del sílabo, o describe la materia con sus fechas, profesor, descripción..."></textarea>
+    </div>
+    <div id="ai-result" style="display:none">
+      <div style="padding:12px;background:var(--gray-100);border-radius:10px;font-size:13px;color:var(--gray-700);line-height:1.6;margin-bottom:12px" id="ai-result-text"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('ai-subject')">Cancelar</button>
+      <button class="btn-save ai-btn" id="btn-ai-generate" onclick="generateSubjectWithAI()">✨ Generar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div id="toast" class="toast"></div>
 
@@ -1125,7 +1378,7 @@
 // ═══════════════════════════════════════
 const SUPABASE_URL = 'https://yazovauswncapzjedqqm.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_KWyjT9bQ7DC5egyGFisbrA_-jhmecKl';
-const ANTHROPIC_KEY = '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';
+
 async function sbGet(table, params = '') {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`, {
     headers: {
@@ -1180,13 +1433,18 @@ async function sbDelete(table, id) {
 // ═══════════════════════════════════════
 let store = { subjects: [], files: [] };
 
+let ANTHROPIC_KEY = '';
+
 async function loadData() {
   showToast('Cargando...');
-  store.subjects = await sbGet('subjects', 'order=id.asc');
-  store.files = await sbGet('files', 'order=id.asc');
-  // normalize field names from DB
-  store.subjects = store.subjects.map(s => ({...s, start: s.start_date, end: s.end_date, desc: s.description}));
-  store.files = store.files.map(f => ({...f, subjectId: f.subject_id}));
+  const [subjects, files, config] = await Promise.all([
+    sbGet('subjects', 'order=id.asc'),
+    sbGet('files', 'order=id.asc'),
+    sbGet('config', 'key=eq.anthropic_key')
+  ]);
+  store.subjects = subjects.map(s => ({...s, start: s.start_date, end: s.end_date, desc: s.description}));
+  store.files = files.map(f => ({...f, subjectId: f.subject_id}));
+  if (config && config[0]) ANTHROPIC_KEY = config[0].value;
 }
 
 let currentSubjectId = null;
@@ -1601,8 +1859,160 @@ async function deleteFile(id) {
 }
 
 // ═══════════════════════════════════════
-// TOAST
+// CLAUDE CHAT
 // ═══════════════════════════════════════
+let chatHistory = [];
+
+function openChat() {
+  document.getElementById('chat-modal').classList.add('open');
+}
+
+function closeChat() {
+  document.getElementById('chat-modal').classList.remove('open');
+}
+
+function sendSuggestion(text) {
+  document.getElementById('chat-input').value = text;
+  sendChat();
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  // Hide suggestions after first message
+  document.getElementById('suggestions-row').style.display = 'none';
+
+  appendChatBubble('user', msg);
+  chatHistory.push({ role: 'user', content: msg });
+
+  const typing = appendChatBubble('typing', '...');
+
+  // Build context from store
+  const context = buildCourseContext();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-client-side-keys-allowed': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: `Eres el asistente académico personal del Pastor Ricardo Rodríguez Bermúdez, estudiante de doctorado en Midwestern Baptist Theological Seminary. 
+Responde siempre en español, de forma clara, respetuosa y concisa.
+Usa "usted" para dirigirte al Pastor Ricardo.
+Tienes acceso a la siguiente información de sus cursos:\n\n${context}`,
+        messages: chatHistory
+      })
+    });
+
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Lo siento, no pude procesar su pregunta.';
+    typing.remove();
+    appendChatBubble('assistant', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    typing.remove();
+    appendChatBubble('assistant', 'Hubo un error al conectar. Intente de nuevo.');
+  }
+}
+
+function appendChatBubble(type, text) {
+  const messages = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `chat-bubble ${type}`;
+  div.textContent = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+  return div;
+}
+
+function buildCourseContext() {
+  let ctx = '';
+  store.subjects.forEach(s => {
+    ctx += `\nMATERIA: ${s.name} (${s.code})\n`;
+    ctx += `Profesor: ${s.prof}\n`;
+    ctx += `Fechas: ${s.start} al ${s.end}\n`;
+    ctx += `Créditos: ${s.credits}\n`;
+    ctx += `Descripción: ${s.desc}\n`;
+    const files = store.files.filter(f => f.subjectId === s.id);
+    if (files.length) {
+      ctx += `Archivos disponibles:\n`;
+      files.forEach(f => ctx += `  - [${f.folder}] ${f.name}\n`);
+    }
+  });
+  return ctx || 'No hay materias cargadas aún.';
+}
+
+// ═══════════════════════════════════════
+// AI SUBJECT GENERATION
+// ═══════════════════════════════════════
+async function generateSubjectWithAI() {
+  const syllabus = document.getElementById('ai-syllabus').value.trim();
+  if (!syllabus) { showToast('Pega el sílabo o descripción'); return; }
+
+  const btn = document.getElementById('btn-ai-generate');
+  btn.textContent = '⏳ Generando...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-client-side-keys-allowed': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: `Extrae información de un sílabo académico y devuelve SOLO un objeto JSON válido con estos campos exactos:
+{
+  "name": "nombre completo de la materia",
+  "code": "código del curso",
+  "credits": "créditos",
+  "prof": "nombre del profesor",
+  "start_date": "fecha de inicio",
+  "end_date": "fecha de fin",
+  "description": "descripción breve del curso en máximo 2 oraciones",
+  "color": "#1a2744",
+  "icon": "📖"
+}
+No incluyas nada más que el JSON.`,
+        messages: [{ role: 'user', content: syllabus }]
+      })
+    });
+
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    const json = JSON.parse(text.replace(/```json|```/g, '').trim());
+
+    // Save to Supabase
+    await sbPost('subjects', json);
+    await loadData();
+    renderAdminSubjects();
+    populateSubjectSelects();
+
+    closeModal('ai-subject');
+    document.getElementById('ai-syllabus').value = '';
+    showToast('¡Materia creada con IA! ✓');
+  } catch(e) {
+    showToast('Error al generar. Intenta de nuevo.');
+  }
+
+  btn.textContent = '✨ Generar';
+  btn.disabled = false;
+}
+
+
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
