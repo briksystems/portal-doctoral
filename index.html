@@ -1067,10 +1067,39 @@
       <label class="form-label">Nombre del archivo</label>
       <input class="form-input" id="f-name" placeholder="Ej: Cómo leer un libro — Van Doren">
     </div>
+
+    <!-- Upload type toggle -->
     <div class="form-group">
-      <label class="form-label">Enlace o URL del archivo</label>
-      <input class="form-input" id="f-url" placeholder="https://drive.google.com/... o enlace directo">
+      <label class="form-label">¿Cómo quieres agregar el archivo?</label>
+      <div class="detail-tabs" style="margin-bottom:0">
+        <button class="tab-btn active" onclick="switchUploadMode('upload')" id="mode-upload-btn">📁 Subir archivo</button>
+        <button class="tab-btn" onclick="switchUploadMode('url')" id="mode-url-btn">🔗 Pegar enlace</button>
+      </div>
     </div>
+
+    <!-- Upload mode -->
+    <div id="upload-mode">
+      <div class="form-group">
+        <label class="form-label">Selecciona el archivo</label>
+        <input type="file" id="f-file" accept=".pdf,.doc,.docx,.mp4" 
+          style="width:100%;padding:12px;border:1.5px dashed var(--gray-300);border-radius:10px;font-size:14px;font-family:Inter,sans-serif;background:var(--gray-100);cursor:pointer">
+        <div id="upload-progress" style="display:none;margin-top:8px">
+          <div style="height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden">
+            <div id="upload-bar" style="height:100%;background:var(--gold);width:0%;transition:width 0.3s;border-radius:3px"></div>
+          </div>
+          <div id="upload-status" style="font-size:12px;color:var(--gray-500);margin-top:4px;text-align:center">Subiendo...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- URL mode -->
+    <div id="url-mode" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Enlace o URL del archivo</label>
+        <input class="form-input" id="f-url" placeholder="https://...">
+      </div>
+    </div>
+
     <div class="form-group">
       <label class="form-label">Tipo</label>
       <select class="form-select" id="f-type">
@@ -1082,7 +1111,7 @@
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('file')">Cancelar</button>
-      <button class="btn-save" onclick="saveFile()">Guardar archivo</button>
+      <button class="btn-save" id="btn-save-file" onclick="saveFile()">Guardar archivo</button>
     </div>
   </div>
 </div>
@@ -1481,13 +1510,71 @@ function clearSubjectForm() {
 }
 
 // ═══════════════════════════════════════
+// UPLOAD MODE TOGGLE
+// ═══════════════════════════════════════
+let uploadMode = 'upload';
+
+function switchUploadMode(mode) {
+  uploadMode = mode;
+  document.getElementById('upload-mode').style.display = mode === 'upload' ? 'block' : 'none';
+  document.getElementById('url-mode').style.display = mode === 'url' ? 'block' : 'none';
+  document.getElementById('mode-upload-btn').classList.toggle('active', mode === 'upload');
+  document.getElementById('mode-url-btn').classList.toggle('active', mode === 'url');
+}
+
+async function uploadToStorage(file) {
+  const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+  const progress = document.getElementById('upload-progress');
+  const bar = document.getElementById('upload-bar');
+  const status = document.getElementById('upload-status');
+  progress.style.display = 'block';
+  bar.style.width = '30%';
+  status.textContent = 'Subiendo archivo...';
+
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/archivos/${fileName}`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': file.type || 'application/octet-stream',
+    },
+    body: file
+  });
+
+  bar.style.width = '100%';
+
+  if (!res.ok) {
+    status.textContent = 'Error al subir. Intenta de nuevo.';
+    return null;
+  }
+
+  status.textContent = '¡Archivo subido!';
+  return `${SUPABASE_URL}/storage/v1/object/public/archivos/${fileName}`;
+}
+
+
+// ═══════════════════════════════════════
 // MODAL: FILE
 // ═══════════════════════════════════════
 async function saveFile() {
   const name = document.getElementById('f-name').value.trim();
-  const url = document.getElementById('f-url').value.trim();
   const subject_id = parseInt(document.getElementById('f-subject').value);
-  if (!name || !url || !subject_id) { showToast('Completa todos los campos'); return; }
+  if (!name || !subject_id) { showToast('Completa el nombre y la materia'); return; }
+
+  let url = '';
+
+  if (uploadMode === 'upload') {
+    const fileInput = document.getElementById('f-file');
+    if (!fileInput.files[0]) { showToast('Selecciona un archivo'); return; }
+    document.getElementById('btn-save-file').disabled = true;
+    url = await uploadToStorage(fileInput.files[0]);
+    document.getElementById('btn-save-file').disabled = false;
+    if (!url) return;
+  } else {
+    url = document.getElementById('f-url').value.trim();
+    if (!url) { showToast('Pega el enlace del archivo'); return; }
+  }
+
   await sbPost('files', {
     subject_id,
     folder: document.getElementById('f-folder').value,
@@ -1495,9 +1582,12 @@ async function saveFile() {
     url,
     type: document.getElementById('f-type').value,
   });
+
   closeModal('file');
   document.getElementById('f-name').value = '';
   document.getElementById('f-url').value = '';
+  document.getElementById('f-file').value = '';
+  document.getElementById('upload-progress').style.display = 'none';
   await loadData();
   renderAdminFiles();
   showToast('Archivo agregado ✓');
