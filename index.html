@@ -1111,7 +1111,7 @@
   </div>
 
   <!-- Chat FAB -->
-  <button class="chat-fab" onclick="openChat()">🤖</button>
+  <button class="chat-fab" onclick="openChat()">💬</button>
 
 </div>
 
@@ -1122,9 +1122,9 @@
   <div class="chat-box">
     <div class="chat-header">
       <div class="chat-header-info">
-        <div class="chat-avatar">AI</div>
+        <div class="chat-avatar">✦</div>
         <div>
-          <div class="chat-header-name">Asistente del curso</div>
+          <div class="chat-header-name">Asistente virtual</div>
           <div class="chat-header-sub">Pregúntame sobre tus materias</div>
         </div>
       </div>
@@ -1376,8 +1376,8 @@
 // ═══════════════════════════════════════
 // SUPABASE CONFIG
 // ═══════════════════════════════════════
-const SUPABASE_URL = 'https://yazovauswncapzjedqqm.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_KWyjT9bQ7DC5egyGFisbrA_-jhmecKl';
+const SUPABASE_URL = 'https://vnjpwesqezlniieacajh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_gcU2D-lgzgt3eCaXx54TzQ_uw4suIZZ';
 
 async function sbGet(table, params = '') {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`, {
@@ -1972,39 +1972,58 @@ async function generateSubjectWithAI() {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1000,
-        system: `Extrae información de un sílabo académico y devuelve SOLO un objeto JSON válido con estos campos exactos:
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
+        system: `Eres un asistente académico. Analiza el sílabo y devuelve SOLO un objeto JSON válido sin texto adicional ni markdown con esta estructura:
 {
-  "name": "nombre completo de la materia",
-  "code": "código del curso",
-  "credits": "créditos",
-  "prof": "nombre del profesor",
-  "start_date": "fecha de inicio",
-  "end_date": "fecha de fin",
-  "description": "descripción breve del curso en máximo 2 oraciones",
-  "color": "#1a2744",
-  "icon": "📖"
+  "subject": {
+    "name": "nombre completo de la materia",
+    "code": "código del curso",
+    "credits": "créditos",
+    "prof": "nombre(s) del profesor separados por · ",
+    "start_date": "fecha de inicio",
+    "end_date": "fecha de fin",
+    "description": "descripción del curso en 2 oraciones máximo",
+    "color": "#1a2744",
+    "icon": "📖"
+  },
+  "files": [
+    { "folder": "instrucciones", "name": "Sílabo del curso", "url": "", "type": "pdf" }
+  ]
 }
-No incluyas nada más que el JSON.`,
+Carpetas válidas: libros, trabajos, instrucciones, recursos.
+En libros: todos los libros y artículos de lectura requeridos, un registro por cada uno.
+En trabajos: todos los trabajos y entregas del estudiante, uno por cada entrega.
+En instrucciones: el sílabo y guías del curso.
+En recursos: enlaces útiles, páginas del curso, bases de datos.
+Los url siempre van vacíos.
+Los type pueden ser: pdf, doc, link.`,
         messages: [{ role: 'user', content: syllabus }]
       })
     });
 
     const data = await res.json();
     const text = data.content?.[0]?.text || '';
-    const json = JSON.parse(text.replace(/```json|```/g, '').trim());
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
 
-    // Save to Supabase
-    await sbPost('subjects', json);
+    const newSubjects = await sbPost('subjects', parsed.subject);
+    const newSubject = Array.isArray(newSubjects) ? newSubjects[0] : newSubjects;
+
+    if (parsed.files && newSubject?.id) {
+      for (const file of parsed.files) {
+        await sbPost('files', { ...file, subject_id: newSubject.id });
+      }
+    }
+
     await loadData();
     renderAdminSubjects();
     populateSubjectSelects();
-
     closeModal('ai-subject');
     document.getElementById('ai-syllabus').value = '';
-    showToast('¡Materia creada con IA! ✓');
+    showToast(`¡Materia creada con ${parsed.files?.length || 0} archivos! ✓`);
   } catch(e) {
+    console.error(e);
     showToast('Error al generar. Intenta de nuevo.');
   }
 
