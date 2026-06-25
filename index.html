@@ -1067,6 +1067,9 @@
     <button class="login-btn btn-admin" onclick="goTo('admin')">
       ⚙️ &nbsp;Administrador
     </button>
+    <div style="margin-top:24px;font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:0.05em">
+      Versión · 25 jun 2026 · 12:45 am
+    </div>
   </div>
 </div>
 
@@ -1288,7 +1291,8 @@
     <div class="form-group">
       <label class="form-label">Carpeta</label>
       <select class="form-select" id="f-folder">
-        <option value="libros">📚 Libros</option>
+        <option value="libros_obligatorios">📚 Libros obligatorios</option>
+        <option value="libros_opcionales">📖 Libros opcionales</option>
         <option value="trabajos">📝 Trabajos</option>
         <option value="instrucciones">📋 Instrucciones</option>
         <option value="recursos">🔗 Recursos</option>
@@ -1497,7 +1501,7 @@ function showStudentView(view) {
     document.getElementById('view-folder').style.display = 'block';
     document.getElementById('back-btn').classList.add('visible');
     const s = store.subjects.find(x => x.id === currentSubjectId);
-    const folderNames = { libros:'📚 Libros', trabajos:'📝 Trabajos', instrucciones:'📋 Instrucciones', recursos:'🔗 Recursos' };
+    const folderNames = { libros_obligatorios:'📚 Libros obligatorios', libros_opcionales:'📖 Libros opcionales', trabajos:'📝 Trabajos', instrucciones:'📋 Instrucciones', recursos:'🔗 Recursos' };
     document.getElementById('header-eyebrow').textContent = s.code;
     document.getElementById('header-title').textContent = folderNames[currentFolder] || currentFolder;
     document.getElementById('header-breadcrumb').innerHTML = '<span>' + (s.name.length > 25 ? s.name.substring(0,25)+'…' : s.name) + '</span>';
@@ -1558,12 +1562,13 @@ function renderSubjectDetail(s) {
   `;
 
   // Folders tab
-  const folders = ['libros','trabajos','instrucciones','recursos'];
+  const folders = ['libros_obligatorios','libros_opcionales','trabajos','instrucciones','recursos'];
   const folderMeta = {
-    libros:   { icon:'📚', label:'Libros', bg:'#f0f4ff' },
-    trabajos: { icon:'📝', label:'Trabajos', bg:'#f0fff4' },
-    instrucciones: { icon:'📋', label:'Instrucciones', bg:'#fff8f0' },
-    recursos: { icon:'🔗', label:'Recursos', bg:'#fdf0ff' },
+    libros_obligatorios: { icon:'📚', label:'Libros obligatorios', bg:'#f0f4ff' },
+    libros_opcionales:   { icon:'📖', label:'Libros opcionales', bg:'#f0f8ff' },
+    trabajos:            { icon:'📝', label:'Trabajos', bg:'#f0fff4' },
+    instrucciones:       { icon:'📋', label:'Instrucciones', bg:'#fff8f0' },
+    recursos:            { icon:'🔗', label:'Recursos', bg:'#fdf0ff' },
   };
   document.getElementById('tab-folders').innerHTML = `
     <div class="folder-list">
@@ -1607,14 +1612,26 @@ function renderFolderFiles() {
     return;
   }
   list.innerHTML = files.map(f => `
-    <a class="file-item" href="${f.url}" target="_blank" rel="noopener">
+    <div class="file-item" style="cursor:default">
       <div class="file-icon">${typeIcon[f.type] || '📄'}</div>
       <div class="file-info">
         <div class="file-name">${f.name}</div>
-        <div class="file-meta">${f.type.toUpperCase()} · Toca para abrir</div>
+        <div class="file-meta">${f.type.toUpperCase()}</div>
       </div>
-      <div style="color:var(--gray-300)">›</div>
-    </a>
+      <div style="display:flex;gap:8px;align-items:center">
+        ${f.url ? `
+          <a href="${f.url}" target="_blank" rel="noopener"
+            style="padding:8px 12px;background:var(--gray-100);border-radius:8px;font-size:12px;font-weight:600;color:var(--navy);text-decoration:none;white-space:nowrap">
+            Abrir
+          </a>
+          ${f.type === 'pdf' || f.type === 'doc' ? `
+          <a href="${f.url}" download
+            style="padding:8px 12px;background:var(--navy);border-radius:8px;font-size:12px;font-weight:600;color:white;text-decoration:none;white-space:nowrap">
+            ↓
+          </a>` : ''}
+        ` : `<span style="font-size:12px;color:var(--gray-300)">Próximamente</span>`}
+      </div>
+    </div>
   `).join('');
 }
 
@@ -1994,8 +2011,9 @@ async function generateSubjectWithAI() {
     { "folder": "instrucciones", "name": "Sílabo del curso", "url": "", "type": "pdf" }
   ]
 }
-Carpetas válidas: libros, trabajos, instrucciones, recursos.
-En libros: todos los libros y artículos de lectura requeridos, un registro por cada uno.
+Carpetas válidas: libros_obligatorios, libros_opcionales, trabajos, instrucciones, recursos.
+En libros_obligatorios: todos los libros y artículos de lectura requeridos obligatoriamente.
+En libros_opcionales: libros y recursos recomendados pero no requeridos.
 En trabajos: todos los trabajos y entregas del estudiante, uno por cada entrega.
 En instrucciones: el sílabo y guías del curso.
 En recursos: enlaces útiles, páginas del curso, bases de datos.
