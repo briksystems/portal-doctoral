@@ -78,7 +78,8 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 
 /* ── BOTTOM NAV ── */
 .bottom-nav{background:var(--white);border-top:1px solid var(--gray-200);display:flex;position:sticky;bottom:0;z-index:10;box-shadow:0 -4px 20px rgba(0,0,0,.06);}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 14px;border:none;background:transparent;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;gap:4px;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 14px;border:none;background:transparent !important;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;gap:4px;outline:none !important;-webkit-appearance:none;-webkit-tap-highlight-color:transparent;box-shadow:none !important;}
+.nav-btn:focus,.nav-btn:active,.nav-btn:hover,.nav-btn:focus-visible{outline:none !important;background:transparent !important;box-shadow:none !important;}
 .nav-btn-icon{font-size:20px;transition:transform .2s;}
 .nav-btn-label{font-size:10px;font-weight:500;color:var(--gray-500);transition:color .2s;}
 .nav-btn.active .nav-btn-label{color:var(--navy);font-weight:700;}
